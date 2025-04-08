@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sunrise Group Of Schools</title>
+  <link rel="stylesheet" href="../assets/css/homepage.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <h1 class="logo"><i class="fas fa-sun"></i>Sunrise Academy</h1>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#">Home</a></li>
+          <li><a href="#features">Why Us</a></li>
+          <li><a href="#">Admissions</a></li>
+          <li><a href="login.html">Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-text">
+      <h2>Learning Today, Leading Tomorrow</h2>
+      <p>Empowering the next generation with knowledge, creativity, and values.</p>
+      <a href="#" class="btn">Get Started</a>
+    </div>
+    <div class="hero-img">
+      <img src="https://cdn.dribbble.com/userupload/36172550/file/original-14a81a6926aac704e4298e192e8386b9.png?resize=800x600" alt="School Illustration" class="hero-illustration"/>
+    </div>
+    <div class="wave"></div>
+  </section>
+
+  <section id="features" class="features">
+    <h2>Why Choose Us?</h2>
+    <div class="features-grid">
+      <div class="feature-box">
+        <i class="fas fa-chalkboard-teacher"></i>
+        <h3>Experienced Teachers</h3>
+        <p>Our faculty brings decades of combined experience and a passion for teaching.</p>
+      </div>
+      <div class="feature-box">
+        <i class="fas fa-laptop-code"></i>
+        <h3>Interactive Learning</h3>
+        <p>We use modern tools to make learning fun, engaging, and effective.</p>
+      </div>
+      <div class="feature-box">
+        <i class="fas fa-shield-alt"></i>
+        <h3>Safe Environment</h3>
+        <p>A secure and nurturing space where students can explore and grow confidently.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Sunrise Academy. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Reveal animation for feature boxes
+    const featureBoxes = document.querySelectorAll('.feature-box');
+    const revealOnScroll = () => {
+      const triggerBottom = window.innerHeight * 0.85;
+      featureBoxes.forEach(box => {
+        const boxTop = box.getBoundingClientRect().top;
+        if (boxTop < triggerBottom) {
+          box.classList.add('visible');
+        }
+      });
+    };
+    window.addEventListener('scroll', revealOnScroll);
+    window.addEventListener('load', revealOnScroll);
+  </script>
+
+</body>
+</html>

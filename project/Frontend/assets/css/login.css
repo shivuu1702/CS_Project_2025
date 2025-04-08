@@ -1,0 +1,215 @@
+/* Reset and Base Styling */
+body {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(120deg, #ffe9d2, #ffe6c7);
+  color: #333;
+}
+
+/* Wrapper for Navigation Bar */
+.wrapper {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+/* Navigation Bar */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  padding: 15px 30px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.nav-logo p {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff7b54;
+}
+
+/* Navigation Menu */
+.nav-menu ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-menu ul li {
+  margin-right: 20px;
+}
+
+.nav-menu ul li a {
+  color: #444;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 18px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-menu ul li a:hover {
+  color: #ff7b54;
+}
+
+.nav-menu ul li a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  background-color: #ff7b54;
+  left: 0;
+  bottom: -5px;
+  transition: 0.3s;
+}
+
+.nav-menu ul li a:hover::after {
+  width: 100%;
+}
+
+/* Nav Buttons */
+.nav-button .btn {
+  padding: 8px 16px;
+  font-size: 16px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  background-color: #ff7b54;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.nav-button .white-btn {
+  background-color: #fff;
+  color: #ff7b54;
+  border: 1px solid #ff7b54;
+}
+
+.nav-button .btn:hover {
+  background-color: #ff5722;
+  color: #fff;
+}
+
+/* Main Form Container */
+.container {
+  max-width: 400px;
+  margin: 160px auto 0;
+  padding: 30px;
+  background-color: #fff6f0;
+  border-radius: 15px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+/* Form Styling */
+form {
+  display: none;
+}
+
+form.active {
+  display: block;
+}
+
+header {
+  font-size: 26px;
+  color: #ff7b54;
+  margin-bottom: 20px;
+}
+
+/* Input Fields */
+.input-box {
+  margin-bottom: 20px;
+}
+
+.input-field, select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ffddc5;
+  border-radius: 8px;
+  background-color: #fff;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+/* Submit Button */
+.submit {
+  width: 100%;
+  padding: 12px;
+  background-color: #ff7b54;
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit:hover {
+  background-color: #ff5722;
+}
+
+/* Switch Buttons */
+.switch-buttons {
+  margin-top: 20px;
+}
+
+.switch-btn {
+  background-color: transparent;
+  border: 2px solid #ff7b54;
+  color: #ff7b54;
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  margin: 0 10px;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.switch-btn:hover {
+  background-color: #ff7b54;
+  color: #fff;
+}
+
+.remember-me {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 10px;
+  color: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+  .container {
+      margin: 100px 20px;
+  }
+
+  .nav-menu ul {
+      flex-direction: column;
+      background-color: #fff;
+      padding: 15px;
+  }
+}
+/* Logo Styling */
+.logo-img {
+  height: 40px;
+  width: auto;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+}
+
+.school-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ff7b54;
+  font-family: 'Nunito', sans-serif;
+}

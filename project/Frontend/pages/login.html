@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>School Management System</title>
+  <link rel="stylesheet" href="../assets/css/login.css" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <div class="wrapper">
+    <nav class="nav">
+      <div class="nav-logo">
+        <img src="your-logo.png" alt="Sunrise Academy Logo" class="logo-img" />
+        <span class="school-name">Sunrise Academy</span>
+      </div>
+      <div class="nav-menu" id="navMenu">
+        <ul>
+          <li><a href="#" class="link active">Home</a></li>
+          <li><a href="#" class="link">Blog</a></li>
+          <li><a href="#" class="link">Services</a></li>
+          <li><a href="#" class="link">About</a></li>
+        </ul>
+      </div>
+      <div class="nav-button">
+        <button class="btn white-btn" id="loginBtn" onclick="login()">Sign In</button>
+        <button class="btn" id="registerBtn" onclick="register()">Sign Up</button>
+      </div>
+      <div class="nav-menu-btn">
+        <i class="bx bx-menu" onclick="myMenuFunction()"></i>
+      </div>
+    </nav>
+  </div>
+
+  <div class="container">
+    <!-- Sign-In Form -->
+    <form id="signinForm" class="active">
+      <header>Sign In</header>
+      <div class="input-box">
+        <select id="userTypeSignin" class="input-field" required>
+          <option value="" disabled selected>Select User Type</option>
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+          <option value="parent">Parent</option>
+        </select>
+      </div>
+      <div class="input-box">
+        <input type="text" id="usernameSignin" class="input-field" placeholder="Email" required />
+      </div>
+      <div class="input-box">
+        <input type="password" id="passwordSignin" class="input-field" placeholder="Password" required />
+      </div>
+      <input type="submit" class="submit" value="Sign In" />
+      <div class="remember-me">
+        <label><input type="checkbox" /> Remember me</label>
+      </div>
+    </form>
+
+    <!-- Sign-Up Form -->
+    <form id="signupForm">
+      <header>Sign Up</header>
+      <div class="input-box">
+        <select id="userTypeSignup" class="input-field" required>
+          <option value="" disabled selected>Select User Type</option>
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+          <option value="parent">Parent</option>
+        </select>
+      </div>
+      <div class="input-box">
+        <input type="text" id="emailSignup" class="input-field" placeholder="Email" required />
+      </div>
+      <div class="input-box">
+        <input type="password" id="passwordSignup" class="input-field" placeholder="Password" required />
+      </div>
+      <input type="submit" class="submit" value="Sign Up" />
+      <div class="remember-me">
+        <label><input type="checkbox" /> Remember me</label>
+      </div>
+    </form>
+
+    <!-- Switch Buttons -->
+    <div class="switch-buttons">
+      <button id="signInBtn" class="switch-btn signin">Sign In</button>
+      <button id="signUpBtn" class="switch-btn signup">Sign Up</button>
+    </div>
+  </div>
+
+  <!-- JavaScript Section -->
+  <script>
+    // Form switching
+    const signInForm = document.getElementById('signinForm');
+    const signUpForm = document.getElementById('signupForm');
+    const signInBtn = document.getElementById('signInBtn');
+    const signUpBtn = document.getElementById('signUpBtn');
+    const container = document.querySelector('.container');
+
+    signInBtn.addEventListener('click', () => {
+      signInForm.classList.add('active');
+      signUpForm.classList.remove('active');
+      container.classList.add('active');
+    });
+
+    signUpBtn.addEventListener('click', () => {
+      signUpForm.classList.add('active');
+      signInForm.classList.remove('active');
+      container.classList.add('active');
+    });
+
+    // Sign In Logic
+    signInForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const userType = document.getElementById('userTypeSignin').value;
+      const email = document.getElementById('usernameSignin').value;
+      const password = document.getElementById('passwordSignin').value;
+
+      if (!userType || !email || !password) {
+        alert('Please fill all fields.');
+        return;
+      }
+
+      try {
+        const res = await fetch('http://localhost:3000/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, role: userType })
+        });
+
+        const data = await res.json();
+
+        if (res.status === 200) {
+          alert('Login successful!');
+          if (userType === 'student') window.location.href = 'student_dashboard.html';
+          else if (userType === 'teacher') window.location.href = 'teacher_dashboard.html';
+          else if (userType === 'parent') window.location.href = 'parent_dashboard.html';
+        } else {
+          alert(data.message || 'Login failed');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Server error, try again.');
+      }
+    });
+
+    // Sign Up Logic
+    signUpForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const userType = document.getElementById('userTypeSignup').value;
+      const email = document.getElementById('emailSignup').value;
+      const password = document.getElementById('passwordSignup').value;
+
+      if (!userType || !email || !password) {
+        alert('Please fill all fields.');
+        return;
+      }
+
+      try {
+        const res = await fetch('http://localhost:3000/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, role: userType })
+        });
+
+        const data = await res.json();
+
+        if (res.status === 201) {
+          alert('Signup successful! You can now sign in.');
+          signInBtn.click();
+        } else {
+          alert(data.message || 'Signup failed');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Server error, try again.');
+      }
+    });
+  </script>
+
+</body>
+</html>

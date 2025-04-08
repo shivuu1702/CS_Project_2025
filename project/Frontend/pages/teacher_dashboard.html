@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/teacher.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+</head>
+<body>
+  <header>
+    <h1>Welcome, Teacher!</h1>
+  </header>
+
+  <div class="container">
+    <nav class="menu">
+      <button onclick="showSection('newAssignmentSection')"><i class="fas fa-tasks"></i> Give New Assignment</button>
+      <button onclick="showSection('checkSubmissionsSection')"><i class="fas fa-check-circle"></i> Check Submissions</button>
+      <button onclick="showSection('announcementsSection')"><i class="fas fa-bullhorn"></i> Make Announcement</button>
+      <button onclick="showSection('timetableSection')"><i class="fas fa-calendar-alt"></i> Manage Timetable</button>
+    </nav>
+
+    <!-- New Assignment Section -->
+    <section id="newAssignmentSection" class="section active">
+      <h2>Upload Assignment for Students</h2>
+      <label for="assignmentTitle">Assignment Title:</label>
+      <input type="text" id="assignmentTitle" placeholder="Title of the assignment"/>
+
+      <label for="assignmentNote">Note for Students:</label>
+      <textarea id="assignmentNote" placeholder="Write a note for students..."></textarea>
+
+      <label for="dueDate">Due Date:</label>
+      <input type="date" id="dueDate"/>
+
+      <label for="uploadAssignment">Upload Assignment (PDF/Photo):</label>
+      <input type="file" id="uploadAssignment"/>
+
+      <button onclick="uploadAssignment()">Upload Assignment</button>
+    </section>
+
+    <!-- Check Submissions Section -->
+    <section id="checkSubmissionsSection" class="section">
+      <h2>Check Submissions</h2>
+      <label for="classSelect">Select Class:</label>
+      <select id="classSelect" onchange="loadStudentSubmissions()">
+        <option value="A">Class A</option>
+        <option value="B">Class B</option>
+        <option value="C">Class C</option>
+        <option value="D">Class D</option>
+      </select>
+
+      <table id="submissionTable" class="submission-table">
+        <thead>
+          <tr>
+            <th>Roll Number</th>
+            <th>Student Name</th>
+            <th>Submitted On</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="submissionList"></tbody>
+      </table>
+    </section>
+
+    <!-- Announcements Section -->
+    <section id="announcementsSection" class="section">
+      <h2>Make a New Announcement</h2>
+      <label for="announcementText">Announcement:</label>
+      <textarea id="announcementText" placeholder="Write your announcement here..."></textarea>
+      <button onclick="makeAnnouncement()">Announce</button>
+    </section>
+
+    <!-- Timetable Section -->
+    <section id="timetableSection" class="section">
+      <h2>Manage Timetable</h2>
+      <div class="timetable-controls">
+        <div class="form-group">
+          <label for="timetableClass"><i class="fas fa-graduation-cap"></i> Select Class:</label>
+          <select id="timetableClass" onchange="loadTimetable()">
+            <option value="">Select Class</option>
+            <option value="1">1st Grade</option>
+            <option value="2">2nd Grade</option>
+            <option value="3">3rd Grade</option>
+            <option value="4">4th Grade</option>
+            <option value="5">5th Grade</option>
+            <option value="6">6th Grade</option>
+            <option value="7">7th Grade</option>
+            <option value="8">8th Grade</option>
+            <option value="9">9th Grade</option>
+            <option value="10">10th Grade</option>
+            <option value="11">11th Grade</option>
+            <option value="12">12th Grade</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="timetableDivision"><i class="fas fa-users"></i> Select Division:</label>
+          <select id="timetableDivision" onchange="loadTimetable()">
+            <option value="">Select Division</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="timetableDay"><i class="fas fa-calendar-day"></i> Select Day:</label>
+          <select id="timetableDay" onchange="loadTimetable()">
+            <option value="">Select Day</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="timetable-edit">
+        <h3>Edit Timetable</h3>
+        <div class="form-group">
+          <label for="periodTime"><i class="fas fa-clock"></i> Period Time:</label>
+          <input type="time" id="periodTime" required/>
+        </div>
+        <div class="form-group">
+          <label for="periodSubject"><i class="fas fa-book"></i> Subject:</label>
+          <input type="text" id="periodSubject" placeholder="Enter subject name" required/>
+        </div>
+        <div class="form-group">
+          <label for="periodTeacher"><i class="fas fa-chalkboard-user"></i> Teacher:</label>
+          <input type="text" id="periodTeacher" placeholder="Enter teacher name" required/>
+        </div>
+        <button onclick="addPeriod()">Add Period</button>
+      </div>
+
+      <div id="timetableDisplay" class="timetable-display"></div>
+    </section>
+  </div>
+
+  <script>
+    function showSection(sectionId) {
+      document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
+      document.getElementById(sectionId).classList.add("active");
+    }
+
+    const studentsData = {
+      A: [
+        { rollNumber: 1, name: "Student 1", submittedOn: "March 18, 2025", status: "Submitted on Time" },
+        { rollNumber: 2, name: "Student 2", submittedOn: "March 20, 2025", status: "Late Submission" },
+        { rollNumber: 3, name: "Student 3", submittedOn: "", status: "Pending" },
+      ],
+      B: [
+        { rollNumber: 1, name: "Student 1", submittedOn: "March 18, 2025", status: "Submitted on Time" },
+        { rollNumber: 2, name: "Student 2", submittedOn: "March 19, 2025", status: "Submitted on Time" },
+        { rollNumber: 3, name: "Student 3", submittedOn: "", status: "Pending" },
+      ],
+    };
+
+    const timetableData = {
+      "1-A": {
+        Monday: [
+          { time: "08:00", subject: "Mathematics", teacher: "Mr. Smith" },
+          { time: "09:00", subject: "Science", teacher: "Ms. Johnson" },
+          { time: "10:00", subject: "English", teacher: "Mrs. Brown" },
+        ],
+        Tuesday: [
+          { time: "08:00", subject: "History", teacher: "Mr. Davis" },
+          { time: "09:00", subject: "Geography", teacher: "Ms. Wilson" },
+          { time: "10:00", subject: "Mathematics", teacher: "Mr. Smith" },
+        ],
+      },
+    };
+
+    function loadStudentSubmissions() {
+      const selectedClass = document.getElementById("classSelect").value;
+      const submissionList = document.getElementById("submissionList");
+      submissionList.innerHTML = "";
+      const students = studentsData[selectedClass] || [];
+
+      students.forEach(student => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${student.rollNumber}</td>
+          <td>${student.name}</td>
+          <td>${student.submittedOn || "Not Submitted"}</td>
+          <td>${student.status}</td>
+        `;
+        submissionList.appendChild(row);
+      });
+    }
+
+    function loadTimetable() {
+      const selectedClass = document.getElementById("timetableClass").value;
+      const selectedDivision = document.getElementById("timetableDivision").value;
+      const selectedDay = document.getElementById("timetableDay").value;
+      const timetableDisplay = document.getElementById("timetableDisplay");
+
+      if (!selectedClass || !selectedDivision || !selectedDay) {
+        timetableDisplay.innerHTML = "<p>Please select class, division, and day to view timetable.</p>";
+        return;
+      }
+
+      const timetableKey = `${selectedClass}-${selectedDivision}`;
+      const daySchedule = timetableData[timetableKey]?.[selectedDay] || [];
+
+      let html = `<table class="timetable">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Subject</th>
+            <th>Teacher</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+      daySchedule.forEach((period, index) => {
+        html += `
+          <tr>
+            <td>${period.time}</td>
+            <td>${period.subject}</td>
+            <td>${period.teacher}</td>
+            <td>
+              <button onclick="editPeriod(${index})" class="edit-btn"><i class="fas fa-edit"></i></button>
+              <button onclick="deletePeriod(${index})" class="delete-btn"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>`;
+      });
+
+      html += `</tbody></table>`;
+      timetableDisplay.innerHTML = html;
+    }
+
+    function addPeriod() {
+      const time = document.getElementById("periodTime").value;
+      const subject = document.getElementById("periodSubject").value;
+      const teacher = document.getElementById("periodTeacher").value;
+      const selectedClass = document.getElementById("timetableClass").value;
+      const selectedDivision = document.getElementById("timetableDivision").value;
+      const selectedDay = document.getElementById("timetableDay").value;
+
+      if (!time || !subject || !teacher || !selectedClass || !selectedDivision || !selectedDay) {
+        alert("Please fill in all fields and selections.");
+        return;
+      }
+
+      const timetableKey = `${selectedClass}-${selectedDivision}`;
+      if (!timetableData[timetableKey]) timetableData[timetableKey] = {};
+      if (!timetableData[timetableKey][selectedDay]) timetableData[timetableKey][selectedDay] = [];
+
+      timetableData[timetableKey][selectedDay].push({ time, subject, teacher });
+      document.getElementById("periodTime").value = "";
+      document.getElementById("periodSubject").value = "";
+      document.getElementById("periodTeacher").value = "";
+      showSuccessMessage("Period added successfully!");
+      loadTimetable();
+    }
+
+    function editPeriod(index) {
+      const selectedClass = document.getElementById("timetableClass").value;
+      const selectedDivision = document.getElementById("timetableDivision").value;
+      const selectedDay = document.getElementById("timetableDay").value;
+      const timetableKey = `${selectedClass}-${selectedDivision}`;
+      const period = timetableData[timetableKey][selectedDay][index];
+
+      document.getElementById("periodTime").value = period.time;
+      document.getElementById("periodSubject").value = period.subject;
+      document.getElementById("periodTeacher").value = period.teacher;
+
+      timetableData[timetableKey][selectedDay].splice(index, 1);
+      showSuccessMessage("Period ready for editing!");
+    }
+
+    function deletePeriod(index) {
+      if (confirm("Are you sure you want to delete this period?")) {
+        const selectedClass = document.getElementById("timetableClass").value;
+        const selectedDivision = document.getElementById("timetableDivision").value;
+        const selectedDay = document.getElementById("timetableDay").value;
+        const timetableKey = `${selectedClass}-${selectedDivision}`;
+        timetableData[timetableKey][selectedDay].splice(index, 1);
+        showSuccessMessage("Period deleted successfully!");
+        loadTimetable();
+      }
+    }
+
+    function uploadAssignment() {
+      const title = document.getElementById("assignmentTitle").value;
+      const note = document.getElementById("assignmentNote").value;
+      const dueDate = document.getElementById("dueDate").value;
+      const fileInput = document.getElementById("uploadAssignment");
+
+      if (title && note && dueDate && fileInput.files.length > 0) {
+        showSuccessMessage("Assignment uploaded successfully!");
+      } else {
+        alert("Please fill in all the fields and select a file.");
+      }
+    }
+
+    function makeAnnouncement() {
+      const text = document.getElementById("announcementText").value;
+      if (text) {
+        showSuccessMessage("Announcement made successfully!");
+      } else {
+        alert("Please write an announcement.");
+      }
+    }
+
+    function showSuccessMessage(message) {
+      const successMsg = document.createElement("div");
+      successMsg.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        z-index: 9999;
+      `;
+      successMsg.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+      document.body.appendChild(successMsg);
+
+      setTimeout(() => successMsg.remove(), 3000);
+    }
+  </script>
+</body>
+</html>
