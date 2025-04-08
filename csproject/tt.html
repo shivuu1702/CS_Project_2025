@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>School Timetable Generator</title>
+  <link rel="stylesheet" href="tt.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>School Timetable Generator</h1>
+    <form id="timetableForm">
+      <div class="form-group">
+        <label for="standard"><i class="fas fa-graduation-cap"></i> Standard (Grade)</label>
+        <select id="standard" required>
+          <option value="">Select Standard</option>
+          <option value="1">1st Grade</option>
+          <option value="2">2nd Grade</option>
+          <option value="3">3rd Grade</option>
+          <option value="4">4th Grade</option>
+          <option value="5">5th Grade</option>
+          <option value="6">6th Grade</option>
+          <option value="7">7th Grade</option>
+          <option value="8">8th Grade</option>
+          <option value="9">9th Grade</option>
+          <option value="10">10th Grade</option>
+          <option value="11">11th Grade</option>
+          <option value="12">12th Grade</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-users"></i> Divisions (Sections)</label>
+        <div class="checkbox-group" id="divisionCheckboxes">
+          <div class="checkbox-item">
+            <input type="checkbox" id="divA" value="A" checked>
+            <label for="divA">A</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="divB" value="B">
+            <label for="divB">B</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="divC" value="C">
+            <label for="divC">C</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="divD" value="D">
+            <label for="divD">D</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="subjects"><i class="fas fa-book"></i> Subjects (Comma-separated)</label>
+        <input type="text" id="subjects" placeholder="Math, Science, English, History, Geography" required>
+      </div>
+
+      <div class="form-group">
+        <label for="teachers"><i class="fas fa-chalkboard-user"></i> Teachers (Comma-separated)</label>
+        <input type="text" id="teachers" placeholder="Mr. Smith, Ms. Lee, Mr. Brown, Mrs. Patel" required>
+      </div>
+
+      <div class="form-group">
+        <label for="startTime"><i class="fas fa-clock"></i> School Start Time</label>
+        <input type="time" id="startTime" value="07:00" required>
+      </div>
+
+      <div class="form-group">
+        <label for="endTime"><i class="fas fa-clock"></i> School End Time</label>
+        <input type="time" id="endTime" value="13:00" required>
+      </div>
+
+      <div class="form-group">
+        <label for="periodDuration"><i class="fas fa-hourglass-half"></i> Period Duration (minutes)</label>
+        <input type="number" id="periodDuration" value="45" min="15" max="120" required>
+      </div>
+
+      <div class="form-group">
+        <label for="breakAfterPeriods"><i class="fas fa-coffee"></i> Add Break After ___ Periods</label>
+        <input type="number" id="breakAfterPeriods" value="3" min="1" max="6" required>
+      </div>
+
+      <div class="form-group">
+        <label for="breakDuration"><i class="fas fa-coffee"></i> Break Duration (minutes)</label>
+        <input type="number" id="breakDuration" value="30" min="5" max="60" required>
+      </div>
+
+      <button type="button" onclick="generateAutoTimetable()">Generate Timetables</button>
+    </form>
+
+    <div id="timetableResult"></div>
+  </div>
+
+  <script>
+    function generateAutoTimetable() {
+      const standard = document.getElementById('standard').value;
+      const divisions = Array.from(document.querySelectorAll('#divisionCheckboxes input:checked')).map(el => el.value);
+      const subjects = document.getElementById('subjects').value.split(',').map(s => s.trim());
+      const teachers = document.getElementById('teachers').value.split(',').map(t => t.trim());
+
+      if (!standard || divisions.length === 0 || subjects.length === 0 || teachers.length === 0) {
+        alert("Please fill all required fields!");
+        return;
+      }
+
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const periodDuration = parseInt(document.getElementById('periodDuration').value);
+      const breakAfterPeriods = parseInt(document.getElementById('breakAfterPeriods').value);
+      const breakDuration = parseInt(document.getElementById('breakDuration').value);
+
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const resultDiv = document.getElementById('timetableResult');
+      resultDiv.innerHTML = '';
+
+      divisions.forEach(division => {
+        const container = document.createElement('div');
+        container.className = 'timetable-container';
+
+        const title = document.createElement('h2');
+        title.className = 'division-title';
+        title.textContent = `Standard ${standard} - Division ${division}`;
+        container.appendChild(title);
+
+        days.forEach(day => {
+          const dayTitle = document.createElement('h3');
+          dayTitle.className = 'day-title';
+          dayTitle.textContent = day;
+          container.appendChild(dayTitle);
+
+          let html = `<table class="timetable"><tr><th>Time</th><th>Subject</th><th>Teacher</th></tr>`;
+          let currentTime = parseTime(startTime);
+          const endTimeObj = parseTime(endTime);
+          let periodCount = 0;
+
+          // Shuffle subjects and teachers each day
+          const dailySubjects = shuffleArray(structuredClone(subjects));
+          const dailyTeachers = shuffleArray(structuredClone(teachers));
+
+          while (currentTime < endTimeObj) {
+            if (periodCount > 0 && periodCount % breakAfterPeriods === 0) {
+              const breakEnd = addMinutes(currentTime, breakDuration);
+              if (breakEnd >= endTimeObj) break;
+              html += `<tr class="break">
+                <td>${formatTime(currentTime)} - ${formatTime(breakEnd)}</td>
+                <td colspan="2"><i class="fas fa-coffee"></i> BREAK</td>
+              </tr>`;
+              currentTime = breakEnd;
+            }
+
+            const periodEnd = addMinutes(currentTime, periodDuration);
+            if (periodEnd > endTimeObj) break;
+
+            const subject = dailySubjects[periodCount % dailySubjects.length];
+            const teacher = dailyTeachers[periodCount % dailyTeachers.length];
+
+            html += `<tr>
+              <td>${formatTime(currentTime)} - ${formatTime(periodEnd)}</td>
+              <td>${subject}</td>
+              <td>${teacher}</td>
+            </tr>`;
+
+            currentTime = periodEnd;
+            periodCount++;
+          }
+
+          html += `</table>`;
+          container.innerHTML += html;
+        });
+
+        resultDiv.appendChild(container);
+      });
+    }
+
+    // Shuffle utility
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function parseTime(str) {
+      const [h, m] = str.split(':').map(Number);
+      const date = new Date();
+      date.setHours(h, m, 0, 0);
+      return date;
+    }
+
+    function addMinutes(time, mins) {
+      const newTime = new Date(time);
+      newTime.setMinutes(newTime.getMinutes() + mins);
+      return newTime;
+    }
+
+    function formatTime(time) {
+      let hours = time.getHours();
+      const minutes = time.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      return `${hours}:${minutes} ${ampm}`;
+    }
+  </script>
+</body>
+</html> 
